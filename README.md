@@ -10,6 +10,6 @@ A web application that allows users to create quiz. users can choose the topic, 
 - react 
 
 ## Getting Started
-- clone the repo  with <code>git cone https://github.com/animogm/quiz-app.git</code>
 - Run npm install
 - Run npm start
+- Run node server.js
