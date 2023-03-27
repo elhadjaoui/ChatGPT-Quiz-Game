@@ -14,13 +14,15 @@ const AppContext = createContext();
 const AppProvider = ({ children }) => {
   const [waiting, setWaiting] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [loading4read, setLoading4read] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState(false);
   const [index, setIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
+  const [resume, setResume] = useState("");
   const [questions, setQuestions] = useState({});
   const [quiz, setQuiz] = useState({
-    amount: 6,
+    amount: 2,
     category: "football",
     difficulty: "easy",
     type: "boolean",
@@ -38,12 +40,13 @@ const AppProvider = ({ children }) => {
           'Content-Type': 'application/json'
         }
       });
-      if (response) {
-        const data = await response.json();
-        console.log( "data ==>",data.result);
-        console.log(data.result.length);
-        if (data.result.questions.length > 0) {
-          setQuestions(data.result);
+      const data = await response.json();
+      if (data) {
+        console.log(data.result);
+        const result = JSON.parse(data.result);
+
+        if (data.result.length > 0) {
+          setQuestions(result);
           setLoading(false);
           setWaiting(false);
           setError(false);
@@ -58,7 +61,31 @@ const AppProvider = ({ children }) => {
       console.error(error);
     }
   };
-
+  const fetchApi4Debrief = async (prompt) => {
+    setLoading(true);
+    try {
+      // const response = await axios.post(url);
+      const response = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        body: JSON.stringify({ prompt }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      if (data) {
+        console.log(data);
+        const {result} = data
+        setResume(result);
+        setLoading4read(false);
+        setError(false);
+      } else {
+        setError(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const nextQuestion = () => {
     setIndex((prevIndex) => {
       if (prevIndex === questions.length - 1) {
@@ -95,19 +122,30 @@ const AppProvider = ({ children }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const { amount, category, difficulty, type } = quiz;
-    let prompt = `give me a list of  ${amount}  trivia questions about ${category} with 4 answers at least one is correct 
-    and please make the questions very ${difficulty} 
+    let prompt;
+    type === "multiple" ?
+      prompt = `give me a list of  ${amount} very ${difficulty} trivia questions about ${category} with 4 answers at least one is correct 
     Put this message in the following JSON structure
     
-    {
-    "questions":
     [
     {"question":"..", 
     "answers": [],
     "correctanswer":".."
     }
     ]
-    }`;
+    ` :
+
+      prompt = `give me a list of  ${amount} very ${difficulty} trivia questions about ${category} with true or flase answers at least one is correct
+    Put this message in the following JSON structure
+    
+    [
+    {"question":"..", 
+    "answers": [],
+    "correctanswer":".."
+    }
+    ]
+    `
+      ;
     fetchApi(prompt);
   };
 
@@ -116,6 +154,7 @@ const AppProvider = ({ children }) => {
       value={{
         waiting,
         loading,
+        loading4read,
         index,
         questions,
         error,

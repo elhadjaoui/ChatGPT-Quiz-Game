@@ -16,7 +16,7 @@ const { Configuration, OpenAIApi }   = OpenAI
 
 const configuration = new Configuration({
     organization: "org-wuIGUPjxNzG76JH0FndlxOSb",
-    apiKey: "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",
+    apiKey: "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",
 });
 
 const openai = new OpenAIApi(configuration);
@@ -35,7 +35,7 @@ app.post('/', async (req, res) => {
       {
         res.json({result : response.data.choices[0].text});
       }
-    // res.json({message:"helloooooo"})
+ 
 });
 
 app.listen(port, () => console.log(`app listening on port ${port}!`))

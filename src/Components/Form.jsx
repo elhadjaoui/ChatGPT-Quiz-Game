@@ -26,7 +26,7 @@ const Form = () => {
         </div>
         <div className="flex flex-col space-y-2">
           <label className="text-gray-600 font-medium" htmlFor="category">
-            Select Category
+            Select Topic
           </label>
           <select
             id="category"
@@ -83,7 +83,7 @@ const Form = () => {
         )}
         <button
           type="submit"
-          className="bg-yellow-600 rounde-md w-full p-2 text-white hover:bg-yellow-500"
+          className=" bg-green-700 rounde-md w-full p-2 text-white hover:bg-yellow-500"
         >
           Start
         </button>

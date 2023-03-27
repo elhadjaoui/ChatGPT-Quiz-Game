@@ -1,4 +1,5 @@
 import React from 'react';
+import Debrief from './Debrief';
 import Quizz from './Quizz';
 const App = () => {
 
@@ -11,7 +12,7 @@ const App = () => {
     <div onClick={() => setActiveTab(1)} className={`tab  tab-lifted ${activeTab === 1  ?  "tab-active" : ""} `}>Match Debrief</div>
         
       </div>
-      {activeTab === 0 ? <Quizz /> : <div>Match Debrief</div>}
+      {activeTab === 0 ? <Quizz /> : <Debrief/>}
     </div>
   )
 
