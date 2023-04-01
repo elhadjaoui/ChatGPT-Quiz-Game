@@ -1,4 +1,5 @@
-import { useState, useContext, createContext } from "react";
+import { useState, useContext, createContext, useRef } from "react";
+import { data } from "./db";
 
 // const table = {
 //   sports: 21,
@@ -12,15 +13,21 @@ const API_ENDPOINT = 'http://localhost:3005';
 const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
+  const label = useRef()
   const [waiting, setWaiting] = useState(true);
   const [loading, setLoading] = useState(false);
   const [loading4read, setLoading4read] = useState(false);
+  const [loading4listen, setLoading4listen] = useState(false);
+  const [read, setRead] = useState(false);
+  const [listen, setListen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState(false);
   const [index, setIndex] = useState(0);
+  const [audio, setAudio] = useState("");
   const [correct, setCorrect] = useState(0);
   const [resume, setResume] = useState("");
   const [questions, setQuestions] = useState({});
+  const [cards, setCards] = useState(data);
   const [quiz, setQuiz] = useState({
     amount: 2,
     category: "football",
@@ -62,7 +69,7 @@ const AppProvider = ({ children }) => {
     }
   };
   const fetchApi4Debrief = async (prompt) => {
-    setLoading(true);
+    setLoading4read(true);
     try {
       // const response = await axios.post(url);
       const response = await fetch(API_ENDPOINT, {
@@ -79,9 +86,54 @@ const AppProvider = ({ children }) => {
         setResume(result);
         setLoading4read(false);
         setError(false);
+        setRead(true);
+        setListen(true);
       } else {
         setError(true);
       }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const fetchApi4Listen = async () => {
+    console.log("*** = ",resume.slice(0,300));
+    setLoading4listen(true);
+    try {
+      // const response = await axios.post(url);
+      fetch("https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM", {
+        method: 'POST',
+        body:  JSON.stringify({
+          "text": resume.slice(0,300),
+          "voice_settings": {
+            "stability": 0,
+            "similarity_boost": 0
+          }
+        },),
+        headers: {
+          'Content-Type': 'application/json',
+          'xi-api-key': '94a271361c453711b4f98c8dc3fe431f',
+          'accept': 'audio/mpeg' 
+         
+        }
+      }).then(response => response.blob()).then(blob => {
+        const audioUrl = window.URL.createObjectURL(new Blob([blob]));
+        console.log(audioUrl.slice(5));
+        const audio = new Audio(audioUrl);
+        audio.play();
+        setAudio(audioUrl.slice(5));
+      });
+      // setLoading4listen(false);
+      // setAudio(response)
+    
+      // if (data) {
+      //   console.log(data);
+      //   const {result} = data
+      //   setResume(result);
+      //   setLoading4listen(false);
+      //   setError(false);
+      // } else {
+      //   setError(true);
+      // }
     } catch (error) {
       console.error(error);
     }
@@ -148,24 +200,37 @@ const AppProvider = ({ children }) => {
       ;
     fetchApi(prompt);
   };
-
+  const ReadSumbit = (prompt) => {
+    fetchApi4Debrief(prompt);
+  };
   return (
     <AppContext.Provider
       value={{
         waiting,
         loading,
         loading4read,
+        loading4listen,
         index,
+        resume,
+        label,
         questions,
         error,
         correct,
+        read,
+        audio,
+        listen,
+        cards,
         nextQuestion,
         checkAnswer,
         isModalOpen,
         closeModal,
         quiz,
         handleChange,
+        setCards,
+        ReadSumbit,
         handleSubmit,
+        fetchApi4Listen,
+        setRead,
       }}
     >
       {children}
