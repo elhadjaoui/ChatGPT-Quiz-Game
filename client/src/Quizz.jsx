@@ -4,6 +4,7 @@ import { useGlobalContext } from "./context";
 import Form from "./Components/Form";
 import Loading from "./Components/Loading";
 import Modal from "./Components/Modal";
+import Results from './Results';
 
 function Quizz() {
   const {
@@ -13,7 +14,13 @@ function Quizz() {
     questions,
     nextQuestion,
     checkAnswer,
+    showResults,
+    questions_answered
   } = useGlobalContext();
+// console.log(questions_answered);
+  if (showResults) {
+    return <Results />;
+  }
 
   if (waiting) {
     return <Form />;
@@ -21,7 +28,7 @@ function Quizz() {
   if (loading) {
     return <Loading />;
   }
-
+console.log(questions);
   const { answers, correctanswer, question } = questions[index];
 
   return (
@@ -40,7 +47,7 @@ function Quizz() {
           <div className="grid grid-cols-1 my-5 space-y-2 place-content-center">
             {answers.map((answer, index) => {
               return (
-                <button onClick={() => checkAnswer(answer === correctanswer)}
+                <button onClick={() => checkAnswer(answer === correctanswer, index)}
                   key={index}
                   className="bg-blue-500 w-4/5 rounded-lg mx-auto text-white p-2 hover:bg-blue-400">{answer}</button>
               );

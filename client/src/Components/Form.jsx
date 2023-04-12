@@ -4,6 +4,7 @@ const Form = () => {
   const { quiz, handleSubmit, handleChange, error } = useGlobalContext();
   return (
     <div className="justify-center flex items-center min-h-screen  w-full">
+          <ShowPrompt />
       <form
         onSubmit={handleSubmit}
         className="bg-white p-5 md:p-8 max-w-[500px] space-y-8 shadow rounded-lg w-11/12 "
@@ -34,7 +35,7 @@ const Form = () => {
             className="bg-gray-200 p-2 rounded-md outline-0 focus:bg-gray-300"
             value={quiz.category}
             onChange={handleChange}
-           
+
           >
             <option value="football">football</option>
             <option value="fc barcelona">fc barcelona</option>
@@ -52,7 +53,7 @@ const Form = () => {
             className="bg-gray-200 p-2 rounded-md outline-0 focus:bg-gray-300"
             value={quiz.difficulty}
             onChange={handleChange}
-           
+
           >
             <option value="easy">easy</option>
             <option value="medium">medium</option>
@@ -69,11 +70,11 @@ const Form = () => {
             className="bg-gray-200 p-2 rounded-md outline-0 focus:bg-gray-300"
             value={quiz.type}
             onChange={handleChange}
-           
+
           >
             <option value="multiple">multiple choice</option>
             <option value="boolean">true or false</option>
-           
+
           </select>
         </div>
         {error && (
@@ -83,13 +84,45 @@ const Form = () => {
         )}
         <button
           type="submit"
-          className=" bg-green-700 rounde-md w-full p-2 text-white hover:bg-yellow-500"
+          className=" btn w-full bg-green-700"
         >
           Start
         </button>
+        <label htmlFor="show-prompt" className="btn w-full bg-green-700">Show Prompt</label>
       </form>
     </div>
   );
 };
 
-export default Form;
+export const ShowPrompt = () => {
+  const { quiz } = useGlobalContext();
+  const { amount, category, difficulty, type } = quiz;
+  let prompt;
+
+    prompt = `give me a list of  ${amount} very ${difficulty} trivia questions about ${category} with 4 answers at least one is correct 
+  Put this message in the following JSON structure
+  
+  [
+  {"question":"..", 
+  "answers": [],
+  "correctanswer":".."
+  }
+  ]`;
+  return (
+    <div>
+      <input type="checkbox" id="show-prompt" className="modal-toggle" />
+      <div className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Prompt Used</h3>
+          <p className="py-4 text-">{prompt}</p>
+          <div className="modal-action">
+            <label htmlFor="show-prompt" className="btn bg-green-700">Close</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+  export default Form;

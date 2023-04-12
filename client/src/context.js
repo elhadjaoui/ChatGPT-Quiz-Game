@@ -24,11 +24,14 @@ const AppProvider = ({ children }) => {
   const [listen, setListen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   const [index, setIndex] = useState(0);
   const [audio, setAudio] = useState("");
   const [correct, setCorrect] = useState(0);
   const [resume, setResume] = useState("");
   const [questions, setQuestions] = useState({});
+  const [questions_answered, setQuestions_Answered] = useState([]);
+  
   const [cards, setCards] = useState(data);
   const [quiz, setQuiz] = useState({
     amount: 2,
@@ -45,7 +48,7 @@ const AppProvider = ({ children }) => {
 
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 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',
+        'Authorization': 'Bearer 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',
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
@@ -73,7 +76,7 @@ const AppProvider = ({ children }) => {
       .catch(error => console.error(error))
     // try {
     //   // const response = await axios.post(url);
-    //   openai.apiKey = "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";
+    //   openai.apiKey = "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";
     //   openai
     //     .Completion
     //     .create({
@@ -136,7 +139,7 @@ const AppProvider = ({ children }) => {
 
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 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',
+        'Authorization': 'Bearer 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',
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
@@ -162,7 +165,7 @@ const AppProvider = ({ children }) => {
       })
       .catch(error => console.error(error))
     // try {
-    //   openai.apiKey = "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";
+    //   openai.apiKey = "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";
     //   openai
     //     .Completion
     //     .create({
@@ -267,11 +270,25 @@ const AppProvider = ({ children }) => {
       }
     });
   };
+  const ToNext = () => {
+    setIndex((prevIndex) => {
+      if (prevIndex === questions.length - 1) {
+        setShowResults(false);
+        return questions.length - 1;
+      } else {
+        return prevIndex + 1;
+      }
+    });
+  };
 
-  const checkAnswer = (value) => {
+  const checkAnswer = (value, ind) => {
     if (value) {
       setCorrect((prev) => prev + 1);
     }
+    const qa = questions[index];
+    qa.iscorrect = value;
+    qa.chosen = ind;
+    setQuestions_Answered((prev) => [...prev, qa]);
     nextQuestion();
   };
 
@@ -292,6 +309,8 @@ const AppProvider = ({ children }) => {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIndex(0);
+    setQuestions_Answered([]);
     const { amount, category, difficulty, type } = quiz;
     let prompt;
     type === "multiple" ?
@@ -301,7 +320,8 @@ const AppProvider = ({ children }) => {
     [
     {"question":"..", 
     "answers": [],
-    "correctanswer":".."
+    "correctanswer":"..",
+    "indexofrightanswer": ".."
     }
     ]
     ` :
@@ -312,7 +332,8 @@ const AppProvider = ({ children }) => {
     [
     {"question":"..", 
     "answers": [],
-    "correctanswer":".."
+    "correctanswer":"..",
+    "indexofrightanswer": ".."
     }
     ]
     `
@@ -339,7 +360,11 @@ const AppProvider = ({ children }) => {
         audio,
         listen,
         cards,
+        questions_answered,
+        showResults,
+        setShowResults,
         nextQuestion,
+        ToNext,
         checkAnswer,
         isModalOpen,
         closeModal,
